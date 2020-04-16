@@ -1,0 +1,9 @@
+apiVersion: projectcalico.org/v3
+kind: IPPool
+metadata:
+  name: new-pool
+spec:
+  cidr: 10.48.1.0/24
+  blockSize: 26
+  ipipMode: Never
+  natOutgoing: true
