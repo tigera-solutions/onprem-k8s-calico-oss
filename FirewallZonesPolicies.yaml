@@ -1,0 +1,92 @@
+---
+apiVersion: projectcalico.org/v3
+kind: NetworkPolicy
+metadata:
+  name: dmz
+spec:
+  order: 0
+  selector: fw-zone == "dmz"
+  ingress:
+    - action: Allow
+      source:
+        nets:
+          - 18.0.0.0/16
+      destination: {}
+    - action: Deny
+      source: {}
+      destination: {}
+  egress:
+    - action: Allow
+      source: {}
+      destination:
+        selector: fw-zone == "trusted"||app == "logging"
+    - action: Deny
+      source: {}
+      destination: {}
+  types:
+    - Ingress
+    - Egress
+---
+---
+apiVersion: projectcalico.org/v3
+kind: NetworkPolicy
+metadata:
+  name: trusted
+spec:
+  order: 10
+  selector: fw-zone == "trusted"
+  ingress:
+    - action: Allow
+      source:
+        selector: fw-zone == "dmz"
+      destination: {}
+    - action: Allow
+      source:
+        selector: fw-zone == "trusted"
+      destination: {}
+    - action: Deny
+      source: {}
+      destination: {}
+  egress:
+    - action: Allow
+      source: {}
+      destination:
+        selector: fw-zone == "trusted"
+    - action: Allow
+      source: {}
+      destination:
+        selector: fw-zone == "restricted"
+    - action: Deny
+      source: {}
+      destination: {}
+  types:
+    - Ingress
+    - Egress
+---
+apiVersion: kubeproxy.config.k8s.io/v1alpha1
+apiVersion: projectcalico.org/v3
+kind: NetworkPolicy
+metadata:
+  name: restricted
+spec:
+  order: 20
+  selector: fw-zone == "restricted"
+  ingress:
+    - action: Allow
+      source:
+        selector: fw-zone == "trusted"
+      destination: {}
+    - action: Allow
+      source:
+        selector: fw-zone == "restricted"
+      destination: {}
+    - action: Deny
+      source: {}
+      destination: {}
+  egress:
+    - action: Allow
+      source: {}
+      destination: {}
+  types:
+    - Ingress
+    - Egress
