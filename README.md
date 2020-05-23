@@ -97,8 +97,8 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 3. You should see an output similar to below. It will be different and unique to your environment.
 
 ```
-sudo kubeadm join 10.0.0.10:6443 --token 0d3aqz.u2bmp0zwlfdh5pmt \
-    --discovery-token-ca-cert-hash sha256:726cf64d358aded6a6584271c5342178f10834e254bfe8ff08357dcc3c6af877
+kubeadm join 10.0.0.10:6443 --token 0d3aqz.u2bmp0zwlfdh5pmt \
+  --discovery-token-ca-cert-hash sha256:726cf64d358aded6a6584271c5342178f10834e254bfe8ff08357dcc3c6af877
 ```
 
 4. Install and configure `calicoctl`
@@ -137,7 +137,7 @@ sudo cp calicoctl.cfg /etc/calico
 sudo kubeadm reset
 ```
 
-3. Copy the command from step 3 above and run it on each of your worker nodes. It will look similar to below, but different.
+3. Copy the command from step 3 above and run it on each of your worker nodes. It will look similar to below except you'll have a different token and hash. Make sure you run the command on each worker as root or with sudo.
 
 ```
 sudo kubeadm join 10.0.0.10:6443 --token 42sy8h.gg7su3eb12dvbu76 --discovery-token-ca-cert-hash sha256:b34cc7c3ee43d7476639624d9b2da9fed9365b7f79525b5c15030f37114a4ccb
@@ -162,7 +162,6 @@ Run 'kubectl get nodes' on the control-plane to see this node join the cluster.
 
 4. Login to the other workers and repeat steps 2 and 3.
 
-
 ##### Only Master node
 
 ##### Configure and Install Calico
@@ -179,8 +178,9 @@ curl https://docs.projectcalico.org/manifests/calico.yaml -o calico.yaml
 open calico.yaml
 ```
 
-3. Configure the initial IP Pool by setting `CALICO_IPV4POOL_CIDR` to 10.48.0.0/24
-4. Disable encap by setting `CALICO_IPV4POOL_IPIP` to `Never`
+3. Configure the initial IP Pool prefix by setting `CALICO_IPV4POOL_CIDR` to 10.48.0.0/24
+
+4. Disable IP-in-IP encapsulation by setting `CALICO_IPV4POOL_IPIP` to `Never`
 
 5. Apply the `calico.yaml`
 
@@ -192,7 +192,7 @@ kubectl apply -f calico.yaml
 
 Let's look around and explore
 
-1. Check out the Calico node status
+1. Check out the Calico node status.
 
 ```
 sudo calicoctl node status
@@ -213,7 +213,7 @@ IPv6 BGP status
 No IPv6 peers found.
 ```
 
-2. Verify our IP pool settings
+2. Verify your IP pool settings
 
 ```
 calicoctl get ippools default-ipv4-ippool -o yaml
