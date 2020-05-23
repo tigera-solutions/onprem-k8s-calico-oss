@@ -41,7 +41,7 @@
 1. Install kubeadm, cluster dependencies, and friends
 
 ```
-K8SVERSION=1.15.4-00
+K8SVERSION=1.18.3-00
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add
 sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
 sudo apt update -y
@@ -60,14 +60,16 @@ sudo kubeadm config images pull
 sudo hostnamectl set-hostname `hostname -f`
 ```
 
-#### Master node
+#### Only Master node
 
 ##### Initial setup
 
 1. Initialize the kubernetes cluster with iptables mode kube-proxy
 
+`kubeadm-config-iptables-mode.yaml`
+
 ```
-echo 'apiVersion: kubeadm.k8s.io/v1beta2
+apiVersion: kubeadm.k8s.io/v1beta2
 kind: ClusterConfiguration
 networking:
   serviceSubnet: 10.49.0.0/16
@@ -76,7 +78,10 @@ networking:
 ---
 apiVersion: kubeproxy.config.k8s.io/v1alpha1
 kind: KubeProxyConfiguration
-mode: iptables' > kubeadm-config-iptables-mode.yaml
+mode: iptables
+```
+
+```
 sudo kubeadm reset -f
 sudo kubeadm init --config kubeadm-config-iptables-mode.yaml
 ```
@@ -99,23 +104,28 @@ sudo kubeadm join 10.0.0.10:6443 --token 0d3aqz.u2bmp0zwlfdh5pmt \
 4. Install and configure `calicoctl`
 
 ```
-curl -O -L  https://github.com/projectcalico/calicoctl/releases/download/v3.13.2/calicoctl
+curl -O -L  https://github.com/projectcalico/calicoctl/releases/download/v3.14.0/calicoctl
 chmod +x calicoctl
 sudo mv calicoctl /usr/local/bin
 ```
 
+`calicoctl.cfg`
+
 ```
-echo 'apiVersion: projectcalico.org/v3
+apiVersion: projectcalico.org/v3
 kind: CalicoAPIConfig
 metadata:
 spec:
   datastoreType: "kubernetes"
-  kubeconfig: "/home/ubuntu/.kube/config"' > calicoctl.cfg
+  kubeconfig: "/home/ubuntu/.kube/config"
+```
+
+```
 sudo mkdir -p /etc/calico
 sudo cp calicoctl.cfg /etc/calico
 ```
 
-#### Worker nodes
+#### Each Worker node
 
 ##### Initial setup
 
@@ -153,7 +163,7 @@ Run 'kubectl get nodes' on the control-plane to see this node join the cluster.
 4. Login to the other workers and repeat steps 2 and 3.
 
 
-##### Master node
+##### Only Master node
 
 ##### Configure and Install Calico
 
@@ -171,10 +181,10 @@ open calico.yaml
 
 3. Configure the initial IP Pool by setting `CALICO_IPV4POOL_CIDR` to 10.48.0.0/24
 4. Disable encap by setting `CALICO_IPV4POOL_IPIP` to `Never`
-          
+
 5. Apply the `calico.yaml`
 
-``` 
+```
 kubectl apply -f calico.yaml
 ```
 
