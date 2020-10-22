@@ -104,7 +104,7 @@ kubeadm join 10.0.0.10:6443 --token 0d3aqz.u2bmp0zwlfdh5pmt \
 4. Install and configure `calicoctl`
 
 ```
-curl -O -L  https://github.com/projectcalico/calicoctl/releases/download/v3.14.0/calicoctl
+curl -O -L  https://github.com/projectcalico/calicoctl/releases/download/v3.16.4/calicoctl
 chmod +x calicoctl
 sudo mv calicoctl /usr/local/bin
 ```
@@ -166,26 +166,43 @@ Run 'kubectl get nodes' on the control-plane to see this node join the cluster.
 
 ##### Configure and Install Calico
 
-1. Pull down Calico
+1. Install the Tigera Calico operator
 
 ```
-curl https://docs.projectcalico.org/manifests/calico.yaml -o calico.yaml
+kubectl create -f https://docs.projectcalico.org/manifests/tigera-operator.yaml
 ```
 
-2. Edit the calico-node DaemonSet
+2. Download the custom-resources.yaml
 
 ```
-open calico.yaml
+curl -O -L https://docs.projectcalico.org/manifests/custom-resources.yaml
 ```
 
-3. Configure the initial IP Pool prefix by setting `CALICO_IPV4POOL_CIDR` to 10.48.0.0/24
+3. Edit the custom-resources.yaml to match your network choices
 
-4. Disable IP-in-IP encapsulation by setting `CALICO_IPV4POOL_IPIP` to `Never`
-
-5. Apply the `calico.yaml`
+For more information on configuration options available in this manifest, see [the installation reference](https://docs.projectcalico.org/reference/installation/api).
 
 ```
-kubectl apply -f calico.yaml
+apiVersion: operator.tigera.io/v1
+kind: Installation
+metadata:
+  name: default
+spec:
+  # Configures Calico networking.
+  calicoNetwork:
+    # Note: The ipPools section cannot be modified post-install.
+    ipPools:
+    - blockSize: 26
+      cidr: 10.48.0.0/24
+      encapsulation: None
+      natOutgoing: Enabled
+      nodeSelector: all()
+```
+
+4. Install Calico by creating the necessary custom resource.
+
+```
+kubectl create -f custom-resources.yaml
 ```
 
 ##### Explore Kubernetes with Calico networking
