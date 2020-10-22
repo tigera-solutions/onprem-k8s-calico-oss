@@ -205,6 +205,25 @@ spec:
 kubectl create -f custom-resources.yaml
 ```
 
+5. Confirm that all of the pods are running with the following command.
+
+```
+watch kubectl get pods -n calico-system
+```
+
+6. Remove the taints on the master so that you can schedule pods on it.
+
+```
+kubectl taint nodes --all node-role.kubernetes.io/master-
+```
+
+7. Confirm that you now have a node in your cluster with the following command.
+
+```
+kubectl get nodes -o wide
+kubectl get pods -o wide --all-namespaces 
+```
+
 ##### Explore Kubernetes with Calico networking
 
 Let's look around and explore
