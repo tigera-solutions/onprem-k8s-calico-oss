@@ -1,5 +1,7 @@
 # Getting up and running with Calico on your on-premises K8s Cluster
 
+This content was built for free training workshops. If you're looking for general docs for Calico, we recommend you start [here](https://docs.projectcalico.org/getting-started/kubernetes/quickstart)
+
 ## Agenda
 
 - Kubernetes networking considerations
