@@ -353,4 +353,4 @@ default     trusted
 * Calico IPAM: https://docs.projectcalico.org/networking/ipam
 * Intro Calico eBPF dataplane: https://www.projectcalico.org/introducing-the-calico-ebpf-dataplane/
 * CNCF Calico eBPF webinar: https://www.cncf.io/webinars/calico-networking-with-ebpf/
-* Trying Calico eBPF dataplane: https://docs.projectcalico.org/getting-started/kubernetes/trying-ebpf
+* About Calico eBPF dataplane: https://docs.projectcalico.org/about/about-ebpf
